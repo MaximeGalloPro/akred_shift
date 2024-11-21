@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  flutter:
+    image: ghcr.io/cirruslabs/flutter:3.24.5
+    volumes:
+      - .:/app
+      - flutter-data:/root
+    working_dir: /app
+    tty: true
+    environment:
+      - DISPLAY=${DISPLAY}
+    ports:
+      - "8080:8080"
+    command: >
+      sh -c '
+      chown -R ${UID:-1000}:${GID:-1000} /app &&
+      find /app -type d -exec chmod 755 {} + &&
+      find /app -type f -exec chmod 644 {} + &&
+      /bin/bash'
+
+volumes:
+  flutter-data:
