@@ -1,23 +1,18 @@
-version: '3.8'
-
 services:
   flutter:
-    image: ghcr.io/cirruslabs/flutter:3.24.5
+    build:
+      context: .
+      args:
+        USER_ID: ${UID:-1000}
+        GROUP_ID: ${GID:-1000}
     volumes:
       - .:/app
-      - flutter-data:/root
-    working_dir: /app
-    tty: true
-    environment:
-      - DISPLAY=${DISPLAY}
+      - flutter-data:/home/developer/flutter
     ports:
       - "8080:8080"
-    command: >
-      sh -c '
-      chown -R ${UID:-1000}:${GID:-1000} /app &&
-      find /app -type d -exec chmod 755 {} + &&
-      find /app -type f -exec chmod 644 {} + &&
-      /bin/bash'
+    user: "${UID:-1000}:${GID:-1000}"
+    tty: true
+    stdin_open: true
 
 volumes:
   flutter-data:

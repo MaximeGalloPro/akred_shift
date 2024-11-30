@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/position.dart';
 import '../providers/event_notifier.dart';
+import '../models/shift.dart';
+
+// Si vous utilisez d'autres modèles, ajoutez leurs imports ici
+import '../models/event.dart';
+import '../models/sector.dart';
 
 class DateSelector extends StatelessWidget {
   final DateTime date;
