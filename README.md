@@ -1,6 +1,6 @@
 # akred_shift
 
-How to start the système :
+How to start the system :
 ```
 docker compose build
 docker compose exec flutter bash
