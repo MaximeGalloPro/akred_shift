@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'pages/event_scheduler_page.dart';
 
 void main() {
+  await dotenv.load(fileName: ".env");
+
   runApp(const ProviderScope(child: MyApp()));
 }
 

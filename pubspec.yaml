@@ -16,6 +16,11 @@ dependencies:
   sqflite: ^2.3.2
   path: ^1.8.3
   uuid: ^4.3.3
+  speech_to_text: ^6.5.1
+  permission_handler: ^11.1.0  # Pour gérer les permissions du microphone
+  http: ^1.1.0
+  intl: ^0.19.0
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -24,3 +29,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - .env

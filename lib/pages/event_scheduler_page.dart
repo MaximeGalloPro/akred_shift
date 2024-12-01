@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../providers/event_notifier.dart';
 import 'sector_page.dart';
+import 'voice_interface_page.dart';
+
 
 class EventSchedulerPage extends ConsumerStatefulWidget {
   const EventSchedulerPage({super.key});
@@ -25,7 +27,7 @@ class _EventSchedulerPageState extends ConsumerState<EventSchedulerPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Dates sauvegardées')),
       );
-      
+
       // Naviguer vers la page des secteurs après la sauvegarde
       Navigator.push(
         context,
@@ -41,8 +43,22 @@ class _EventSchedulerPageState extends ConsumerState<EventSchedulerPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Event Scheduler'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme
+            .of(context)
+            .colorScheme
+            .inversePrimary,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.mic),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const VoiceInterfacePage(),
+                ),
+              );
+            },
+          ),
           if (_rangeStart != null && _rangeEnd != null)
             IconButton(
               onPressed: _saveSelectedRange,
@@ -52,64 +68,82 @@ class _EventSchedulerPageState extends ConsumerState<EventSchedulerPage> {
       ),
       body: event == null
           ? Center(
-              child: ElevatedButton(
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
                 onPressed: () {
                   ref.read(eventProvider.notifier).initEvent(
-                        'test-event',
-                        DateTime.now(),
-                        DateTime.now().add(const Duration(days: 7)),
-                      );
+                    'test-event',
+                    DateTime.now(),
+                    DateTime.now().add(const Duration(days: 7)),
+                  );
                 },
                 child: const Text('Initialiser un événement'),
               ),
-            )
+              const SizedBox(width: 16), // Espace entre les boutons
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(eventProvider.notifier).loadSeedData();
+                },
+                child: const Text('Charger données de test'),
+              ),
+            ]
+        ),
+      )
           : Column(
-              children: [
-                TableCalendar(
-                  firstDay: DateTime.now().subtract(const Duration(days: 365)),
-                  lastDay: DateTime.now().add(const Duration(days: 365)),
-                  focusedDay: _focusedDay,
-                  rangeStartDay: _rangeStart,
-                  rangeEndDay: _rangeEnd,
-                  rangeSelectionMode: RangeSelectionMode.enforced,
-                  onRangeSelected: (start, end, focusedDay) {
-                    setState(() {
-                      _rangeStart = start;
-                      _rangeEnd = end;
-                      _focusedDay = focusedDay;
-                    });
-                  },
-                  onPageChanged: (focusedDay) {
-                    _focusedDay = focusedDay;
-                  },
-                ),
-                if (_rangeStart != null || _rangeEnd != null)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        if (_rangeStart != null)
-                          Text(
-                            'Date de début: ${_rangeStart?.toString().split(' ')[0]}',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        const SizedBox(height: 8),
-                        if (_rangeEnd != null)
-                          Text(
-                            'Date de fin: ${_rangeEnd?.toString().split(' ')[0]}',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        const SizedBox(height: 16),
-                        if (_rangeStart != null && _rangeEnd != null)
-                          ElevatedButton(
-                            onPressed: _saveSelectedRange,
-                            child: const Text('Sauvegarder et continuer'),
-                          ),
-                      ],
+        children: [
+          TableCalendar(
+            firstDay: DateTime.now().subtract(const Duration(days: 365)),
+            lastDay: DateTime.now().add(const Duration(days: 365)),
+            focusedDay: _focusedDay,
+            rangeStartDay: _rangeStart,
+            rangeEndDay: _rangeEnd,
+            rangeSelectionMode: RangeSelectionMode.enforced,
+            onRangeSelected: (start, end, focusedDay) {
+              setState(() {
+                _rangeStart = start;
+                _rangeEnd = end;
+                _focusedDay = focusedDay;
+              });
+            },
+            onPageChanged: (focusedDay) {
+              _focusedDay = focusedDay;
+            },
+          ),
+          if (_rangeStart != null || _rangeEnd != null)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  if (_rangeStart != null)
+                    Text(
+                      'Date de début: ${_rangeStart?.toString().split(' ')[0]}',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .titleMedium,
                     ),
-                  ),
-              ],
+                  const SizedBox(height: 8),
+                  if (_rangeEnd != null)
+                    Text(
+                      'Date de fin: ${_rangeEnd?.toString().split(' ')[0]}',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .titleMedium,
+                    ),
+                  const SizedBox(height: 16),
+                  if (_rangeStart != null && _rangeEnd != null)
+                    ElevatedButton(
+                      onPressed: _saveSelectedRange,
+                      child: const Text('Sauvegarder et continuer'),
+                    ),
+                ],
+              ),
             ),
+        ],
+      ),
     );
   }
 }

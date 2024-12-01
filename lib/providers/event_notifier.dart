@@ -4,6 +4,8 @@ import '../models/event.dart';
 import '../models/sector.dart';
 import '../models/position.dart';
 import '../models/shift.dart';
+import '../utils/seed_generator.dart';
+
 
 final eventProvider = StateNotifierProvider<EventNotifier, Event?>((ref) {
   return EventNotifier();
@@ -11,8 +13,12 @@ final eventProvider = StateNotifierProvider<EventNotifier, Event?>((ref) {
 
 class EventNotifier extends StateNotifier<Event?> {
   EventNotifier() : super(null);
-  
+
   final _uuid = const Uuid();
+
+  void loadSeedData() {
+    state = SeedGenerator.generateSeedEvent();
+  }
 
   void initEvent(String uuid, DateTime startDate, DateTime endDate) {
     state = Event(
@@ -40,7 +46,7 @@ class EventNotifier extends StateNotifier<Event?> {
       name: name,
       positions: [],
     );
-    
+
     state = Event(
       uuid: state!.uuid,
       startDate: state!.startDate,
@@ -61,7 +67,7 @@ class EventNotifier extends StateNotifier<Event?> {
 
   void addPosition(String sectorId, String name) {
     if (state == null) return;
-    
+
     final newPosition = Position(
       id: _uuid.v4(),
       name: name,
@@ -97,7 +103,9 @@ class EventNotifier extends StateNotifier<Event?> {
           return Sector(
             id: sector.id,
             name: sector.name,
-            positions: sector.positions.where((p) => p.id != positionId).toList(),
+            positions: sector.positions
+                .where((p) => p.id != positionId)
+                .toList(),
           );
         }
         return sector;
@@ -105,14 +113,12 @@ class EventNotifier extends StateNotifier<Event?> {
     );
   }
 
-  void addShift(
-    String sectorId, 
-    String positionId,
-    String label,
-    DateTime startTime, 
-    DateTime endTime,
-    [Set<DateTime> excludedDates = const {}]
-  ) {
+  void addShift(String sectorId,
+      String positionId,
+      String label,
+      DateTime startTime,
+      DateTime endTime,
+      [Set<DateTime> excludedDates = const {}]) {
     if (state == null) return;
 
     final newShift = Shift(
@@ -166,7 +172,9 @@ class EventNotifier extends StateNotifier<Event?> {
                 return Position(
                   id: position.id,
                   name: position.name,
-                  shifts: position.shifts.where((s) => s.id != shiftId).toList(),
+                  shifts: position.shifts
+                      .where((s) => s.id != shiftId)
+                      .toList(),
                 );
               }
               return position;
