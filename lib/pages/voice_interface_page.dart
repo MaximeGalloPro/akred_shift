@@ -96,26 +96,55 @@ class _VoiceInterfacePageState extends ConsumerState<VoiceInterfacePage> {
 
       if (aiResponse['action'] == 'create_event') {
         final data = aiResponse['data'];
-
         final startDate = DateTime.parse(data['startDate']);
         final endDate = DateTime.parse(data['endDate']);
 
+        // Initialiser l'événement
         ref.read(eventProvider.notifier).initEvent(
           'voice-event-${const Uuid().v4()}',
           startDate,
           endDate,
         );
 
-        for (final sector in data['sectors']) {
-          ref.read(eventProvider.notifier).addSector(sector['name']);
+        // Récupérer l'état actuel de l'événement
+        final event = ref.read(eventProvider);
+        if (event == null) throw Exception('Événement non créé');
 
-          for (final position in sector['positions']) {
+        // Pour chaque secteur dans les données
+        for (final sectorData in data['sectors']) {
+          // Ajouter le secteur et garder une trace de son ID
+          ref.read(eventProvider.notifier).addSector(sectorData['name']);
+
+          // Récupérer le secteur nouvellement créé
+          final updatedEvent = ref.read(eventProvider);
+          if (updatedEvent == null) continue;
+
+          // Trouver le secteur qu'on vient d'ajouter
+          final sector = updatedEvent.sectors.lastWhere(
+                (s) => s.name == sectorData['name'],
+            orElse: () => throw Exception('Secteur non trouvé'),
+          );
+
+          // Pour chaque position dans le secteur
+          for (final positionData in sectorData['positions']) {
+            // Utiliser l'ID du secteur, pas son nom
             ref.read(eventProvider.notifier).addPosition(
-              sector['name'],
-              position['name'],
+              sector.id,  // Maintenant on utilise l'ID correct
+              positionData['name'],
             );
 
-            for (final shift in position['shifts']) {
+            // Récupérer la position nouvellement créée
+            final currentEvent = ref.read(eventProvider);
+            if (currentEvent == null) continue;
+
+            final currentSector = currentEvent.sectors.firstWhere((s) => s.id == sector.id);
+            final position = currentSector.positions.lastWhere(
+                  (p) => p.name == positionData['name'],
+              orElse: () => throw Exception('Position non trouvée'),
+            );
+
+            // Pour chaque shift
+            for (final shift in positionData['shifts']) {
               final shiftDate = startDate;
               final startTime = TimeOfDay.fromDateTime(
                   DateFormat('HH:mm').parse(shift['startTime'])
@@ -125,8 +154,8 @@ class _VoiceInterfacePageState extends ConsumerState<VoiceInterfacePage> {
               );
 
               ref.read(eventProvider.notifier).addShift(
-                sector['name'],
-                position['name'],
+                sector.id,
+                position.id,  // Utiliser l'ID de la position
                 shift['label'],
                 DateTime(
                   shiftDate.year,

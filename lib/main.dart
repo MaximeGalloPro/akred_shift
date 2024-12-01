@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'pages/event_scheduler_page.dart';
 
-void main() {
+Future<void> main() async {  // Ajout de async
+  // Chargement des variables d'environnement
   await dotenv.load(fileName: ".env");
 
   runApp(const ProviderScope(child: MyApp()));

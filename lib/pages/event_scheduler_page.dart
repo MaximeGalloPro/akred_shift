@@ -43,10 +43,7 @@ class _EventSchedulerPageState extends ConsumerState<EventSchedulerPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Event Scheduler'),
-        backgroundColor: Theme
-            .of(context)
-            .colorScheme
-            .inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
           IconButton(
             icon: const Icon(Icons.mic),
@@ -81,7 +78,7 @@ class _EventSchedulerPageState extends ConsumerState<EventSchedulerPage> {
                 },
                 child: const Text('Initialiser un événement'),
               ),
-              const SizedBox(width: 16), // Espace entre les boutons
+              const SizedBox(width: 16),
               ElevatedButton(
                 onPressed: () {
                   ref.read(eventProvider.notifier).loadSeedData();
@@ -93,6 +90,51 @@ class _EventSchedulerPageState extends ConsumerState<EventSchedulerPage> {
       )
           : Column(
         children: [
+          // Afficher les informations de l'événement actuel
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: Column(
+              children: [
+                Text(
+                  'Événement actuel',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Du: ${event.startDate.toString().split(' ')[0]}',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      'Au: ${event.endDate.toString().split(' ')[0]}',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                if (event.sectors.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text('${event.sectors.length} secteur(s)'),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SectorPage(),
+                        ),
+                      );
+                    },
+                    child: const Text('Gérer les secteurs'),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const Divider(),
+          // Le reste du contenu existant
           TableCalendar(
             firstDay: DateTime.now().subtract(const Duration(days: 365)),
             lastDay: DateTime.now().add(const Duration(days: 365)),
@@ -118,26 +160,20 @@ class _EventSchedulerPageState extends ConsumerState<EventSchedulerPage> {
                 children: [
                   if (_rangeStart != null)
                     Text(
-                      'Date de début: ${_rangeStart?.toString().split(' ')[0]}',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .titleMedium,
+                      'Nouvelle date de début: ${_rangeStart?.toString().split(' ')[0]}',
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   const SizedBox(height: 8),
                   if (_rangeEnd != null)
                     Text(
-                      'Date de fin: ${_rangeEnd?.toString().split(' ')[0]}',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .titleMedium,
+                      'Nouvelle date de fin: ${_rangeEnd?.toString().split(' ')[0]}',
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   const SizedBox(height: 16),
                   if (_rangeStart != null && _rangeEnd != null)
                     ElevatedButton(
                       onPressed: _saveSelectedRange,
-                      child: const Text('Sauvegarder et continuer'),
+                      child: const Text('Mettre à jour les dates'),
                     ),
                 ],
               ),
