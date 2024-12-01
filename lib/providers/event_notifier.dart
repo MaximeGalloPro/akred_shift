@@ -185,4 +185,24 @@ class EventNotifier extends StateNotifier<Event?> {
       }).toList(),
     );
   }
+
+  void renameSector(String oldName, String newName) {
+    if (state == null) return;
+
+    state = Event(
+      uuid: state!.uuid,
+      startDate: state!.startDate,
+      endDate: state!.endDate,
+      sectors: state!.sectors.map((sector) {
+        if (sector.name == oldName) {
+          return Sector(
+            id: sector.id,
+            name: newName,
+            positions: sector.positions,
+          );
+        }
+        return sector;
+      }).toList(),
+    );
+  }
 }
